@@ -1,0 +1,62 @@
+
+'vba script that loops thru column A, starting in row 2, which lists tickers, and column F is the volume on a given
+date for that ticker...so you may have 100 rows of same ticker, each a diff date, with their volume in F; this will
+loop thru and total the volume for each ticker, and make a list in column H (ticker), and associate volume total
+ (column I)
+
+Sub Stock_Market()
+
+Dim Ws As Worksheet
+
+For Each Ws In Worksheets
+Ws.Activate
+
+Dim Ticker As String
+Dim Volume As Double
+Dim lastRow As Double
+
+
+Summary_Row = 2
+Range("h1").Value = "Ticker"
+Range("i1").Value = "Volume"
+
+'check how many rows
+lastRow = Ws.Cells(Rows.Count, "A").End(xlUp).Row
+
+For i = 2 To lastRow
+
+    ' Check if we are still within the same stock ticker, if it is not...
+    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+      ' Set the ticker
+      Ticker = Cells(i, 1).Value
+
+      ' Add to the Volume
+      Volume = Volume + Cells(i, 7).Value
+
+      ' Print the  Ticker in the ticker column
+      Range("H" & Summary_Row).Value = Ticker
+
+      ' Print the Volume to the volume column
+      Range("i" & Summary_Row).Value = Volume
+
+      ' Add one to the summary row
+      Summary_Row = Summary_Row + 1
+      
+      ' Reset the Volume
+      Volume = 0
+
+    ' If the cell immediately following a row is the same brand...
+    Else
+
+      ' Add to the Volume
+      Volume = Volume + Cells(i, 7).Value
+
+    End If
+
+  Next i
+  Next Ws
+
+End Sub
+
+

@@ -1,0 +1,83 @@
+Sub market()
+
+Dim Ws As Worksheet
+
+For Each Ws In Worksheets
+Ws.Activate
+
+Dim Ticker As String
+Dim Volume As Double
+Dim lastRow As Double
+Dim Ticker_Count As Double
+Dim Percent_Change As Double
+Dim Yearly_Change As Double
+
+Summary_Row = 2
+Range("j1").Value = "Yearly Change"
+Range("i1").Value = "Ticker"
+Range("k1").Value = "Percent Change"
+Range("l1").Value = "Total Volume"
+
+'check how many rows
+lastRow = Ws.Cells(Rows.Count, "A").End(xlUp).Row
+
+
+For i = 2 To lastRow
+
+    ' Check if we are still within the same stock ticker, if it is not...
+    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+      ' Set the ticker
+      Ticker = Cells(i, 1).Value
+
+      'Counts the number of instances the ticker appears
+       Ticker_Count = Application.WorksheetFunction.CountIf(Range("A:A"), Cells(i, 1).Value)
+       
+       Yearly_Change = Cells(i, 6) - Cells(i - Ticker_Count + 1, 6)
+       
+       Percent_Change = (Cells(i, 6) - Cells(i - Ticker_Count + 1, 6)) / Cells(i - Ticker_Count + 1, 6)
+
+
+      ' Add to the Volume
+      Volume = Volume + Cells(i, 7).Value
+
+
+      ' Print the  Ticker in the ticker column
+      Range("i" & Summary_Row).Value = Ticker
+
+      ' Print the  Yearly_Change in the Yearly_Change column
+      Range("j" & Summary_Row).Value = Yearly_Change
+      'If Yearly Change is negative, fill cell Red, otherwise Green
+      
+       If (Yearly_Change < 0) Then
+        Range("J" & Summary_Row).Interior.ColorIndex = 3
+        Else
+         Range("J" & Summary_Row).Interior.ColorIndex = 4
+         End If
+         
+      'Print the Percent Change in the Percent Change Column
+      Range("k" & Summary_Row).Value = Percent_Change
+      'Format it as a Percent
+        Range("k" & Summary_Row).NumberFormat = "0.00%"
+
+      ' Print the Volume to the volume column
+      Range("L" & Summary_Row).Value = Volume
+
+      ' Add one to the summary row
+      Summary_Row = Summary_Row + 1
+      
+      ' Reset the Volume
+      Volume = 0
+
+    ' If the cell immediately following a row is the same brand...
+    Else
+
+      ' Add to the Volume
+      Volume = Volume + Cells(i, 7).Value
+
+    End If
+
+  Next i
+  Next Ws
+
+End Sub
